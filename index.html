@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>دليل أجهزة جسم الإنسان | Human Body Systems</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="دليل تعليمي تفاعلي لأجهزة جسم الإنسان مع اختبارات ذكية وتحدي الطبيب.">
+    <meta name="keywords" content="جسم الإنسان, أحياء, تعليم, طب, اختبارات">
+    
+    <!-- Tailwind CSS (via CDN as requested/used by user) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Cairo -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- External Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <!-- Custom Style -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased">
+
+    <div id="app" class="min-h-screen flex flex-col">
+        <!-- Persistent Header -->
+        <header class="main-header glass py-12 px-4 text-center relative overflow-hidden text-white">
+            <div class="header-pattern opacity-10 absolute inset-0"></div>
+            <div class="relative z-10 max-w-4xl mx-auto">
+                <div class="mb-4 inline-flex items-center justify-center p-3 rounded-full bg-white/20 backdrop-blur-md animate-pulse">
+                    <i class="fas fa-heartbeat text-3xl text-rose-400"></i>
+                </div>
+                <h1 class="text-4xl md:text-5xl font-extrabold mb-4 drop-shadow-lg">أجهزة جسم الإنسان</h1>
+                <p class="text-xl md:text-2xl text-indigo-100 font-medium">Human Body Systems Explorer</p>
+                
+                <div class="flex flex-wrap justify-center gap-4 mt-8">
+                    <button id="quiz-trigger" class="btn-premium btn-amber" onclick="app.openQuizModal()">
+                        <i class="fas fa-brain"></i> ✨ اختبر معلوماتك
+                    </button>
+                    <button id="doctor-trigger" class="btn-premium btn-emerald" onclick="app.openDiagnosisGame()">
+                        <i class="fas fa-user-md"></i> ✨ تحدي الطبيب الذكي
+                    </button>
+                    <button id="pdf-trigger" class="btn-premium btn-rose" onclick="app.generatePDF(this)">
+                        <i class="fas fa-file-pdf"></i> تحميل الملزمة (PDF)
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation Filters -->
+        <nav class="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-200 py-4 shadow-sm">
+            <div class="container mx-auto px-4 overflow-x-auto no-scrollbar">
+                <div class="flex justify-center md:flex-wrap gap-3 whitespace-nowrap" id="system-filters">
+                    <button onclick="app.filterSystem('All', this)" class="filter-btn active">الكل (All)</button>
+                    <button onclick="app.filterSystem('Respiratory', this)" class="filter-btn">الجهاز التنفسي</button>
+                    <button onclick="app.filterSystem('Cardiovascular', this)" class="filter-btn">الجهاز الدوري</button>
+                    <button onclick="app.filterSystem('Digestive', this)" class="filter-btn">الجهاز الهضمي</button>
+                    <button onclick="app.filterSystem('Exercises', this)" class="filter-btn">التمارين</button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="flex-grow container mx-auto px-4 py-12">
+            <div id="content-container" class="space-y-16">
+                <!-- Cards will be injected here -->
+                <div class="flex flex-col items-center justify-center py-20 text-slate-400">
+                    <div class="loader-spinner mb-4"></div>
+                    <p>جاري تحميل البيانات التعلمية...</p>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-slate-900 text-slate-400 py-8 px-4 text-center border-t border-slate-800">
+            <p class="mb-2">© 2026 دليل أجهزة جسم الإنسان - التعليم التفاعلي</p>
+            <p class="text-xs uppercase tracking-widest text-slate-600 font-bold">Premium Educational Resource</p>
+        </footer>
+    </div>
+
+    <!-- Modals (Initially Hidden) -->
+    <!-- Quiz Modal -->
+    <div id="quiz-modal" class="modal-backdrop hidden">
+        <div class="modal-content glass max-w-2xl w-full">
+            <div class="modal-header bg-gradient-to-r from-blue-600 to-indigo-700">
+                <h3 class="text-xl font-bold flex items-center gap-2">
+                    <i class="fas fa-brain"></i> اختبار ذكي مخصص
+                </h3>
+                <button onclick="app.closeQuizModal()" class="close-btn">&times;</button>
+            </div>
+            <div id="quiz-body" class="p-8">
+                <!-- Quiz content dynamically injected -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Diagnosis Modal -->
+    <div id="diagnosis-modal" class="modal-backdrop hidden">
+        <div class="modal-content glass max-w-2xl w-full">
+            <div class="modal-header bg-gradient-to-r from-emerald-500 to-teal-600">
+                <h3 class="text-xl font-bold flex items-center gap-2">
+                    <i class="fas fa-user-md"></i> تحدي الطبيب الذكي
+                </h3>
+                <button onclick="app.closeDiagnosisGame()" class="close-btn">&times;</button>
+            </div>
+            <div id="diagnosis-body" class="p-8">
+                <!-- Diagnosis content dynamically injected -->
+            </div>
+        </div>
+    </div>
+
+    <!-- JS Logic -->
+    <script src="app.js"></script>
+</body>
+</html>
