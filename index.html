@@ -1,115 +1,124 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>دليل أجهزة جسم الإنسان | Human Body Systems</title>
+    <title>دليل أجهزة جسم الإنسان | الذكاء الاصطناعي</title>
     
     <!-- SEO Meta Tags -->
-    <meta name="description" content="دليل تعليمي تفاعلي لأجهزة جسم الإنسان مع اختبارات ذكية وتحدي الطبيب.">
-    <meta name="keywords" content="جسم الإنسان, أحياء, تعليم, طب, اختبارات">
+    <meta name="description" content="دليل تعليمي تفاعلي ذكي لأجهزة جسم الإنسان مع دعم الوضع الداكن واختبارات AI.">
     
-    <!-- Tailwind CSS (via CDN as requested/used by user) -->
+    <!-- Design & Tool Libraries -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Google Fonts: Cairo -->
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
     
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- External Libraries -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    
-        <!-- Persistent Header -->
-        <header class="main-header glass py-12 px-4 text-center relative overflow-hidden text-white">
-            <div class="header-pattern opacity-10 absolute inset-0"></div>
-            <div class="relative z-10 max-w-4xl mx-auto">
-                <div class="mb-4 inline-flex items-center justify-center p-3 rounded-full bg-white/20 backdrop-blur-md animate-pulse">
-                    <i class="fas fa-heartbeat text-3xl text-rose-400"></i>
+    <!-- Custom Style -->
+    <link rel="stylesheet" href="style.css">
+
+    <script>
+        // Tailwind Custom Dark Mode Config
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            dark: '#0f172a',
+                            card: '#1e293b',
+                            border: '#334155'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-50 text-slate-900 dark:bg-brand-dark dark:text-slate-100 antialiased overflow-hidden transition-colors duration-500">
+
+    <!-- Screen Loader -->
+    <div id="initial-loader" class="fixed inset-0 bg-white dark:bg-brand-dark z-[100] flex flex-col items-center justify-center transition-opacity duration-700">
+        <div class="loader-spinner !w-16 !h-16"></div>
+        <h2 class="mt-6 text-2xl font-bold text-slate-800 dark:text-slate-200">جاري تحميل المختبر الذكي...</h2>
+    </div>
+
+    <div id="app" class="min-h-screen flex flex-col opacity-0 transition-opacity duration-1000">
+        
+        <!-- Header / ترويسة الموقع -->
+        <header class="sticky top-0 z-40 glass border-b border-slate-200 dark:border-brand-border py-4 px-6 shadow-sm">
+            <div class="container mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="bg-blue-600 p-2 rounded-xl text-white shadow-lg shadow-blue-500/30">
+                        <i class="fas fa-lungs text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-extrabold tracking-tight">أجهزة جسم الإنسان</h1>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest">Interactive AI Guide</p>
+                    </div>
                 </div>
-                <h1 class="text-4xl md:text-5xl font-extrabold mb-4 drop-shadow-lg">أجهزة جسم الإنسان</h1>
-                <p class="text-xl md:text-2xl text-indigo-100 font-medium">Human Body Systems Explorer</p>
-                
-                <div class="flex flex-wrap justify-center gap-4 mt-8">
-                    <button id="quiz-trigger" class="btn-premium btn-amber" onclick="app.openQuizModal()">
-                        <i class="fas fa-brain"></i> ✨ اختبر معلوماتك
+
+                <div class="flex items-center gap-2">
+                    <!-- Dark Mode Toggle -->
+                    <button onclick="app.toggleDarkMode()" class="p-3 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-blue-100 dark:hover:bg-blue-900/40 transition shadow-inner border border-transparent dark:border-brand-border">
+                        <i id="theme-icon" class="fas fa-moon text-slate-600 dark:text-amber-400 transition-transform duration-500"></i>
                     </button>
-                    <button id="doctor-trigger" class="btn-premium btn-emerald" onclick="app.openDiagnosisGame()">
-                        <i class="fas fa-user-md"></i> ✨ تحدي الطبيب الذكي
+                    
+                    <button onclick="app.openQuizModal()" class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-bold transition shadow-lg shadow-blue-500/20 active:scale-95">
+                        <i class="fas fa-brain"></i> <span class="hidden sm:inline">اختبار AI</span>
                     </button>
-                    <button id="pdf-trigger" class="btn-premium btn-rose" onclick="app.generatePDF(this)">
-                        <i class="fas fa-file-pdf"></i> تحميل الملزمة (PDF)
+                    
+                    <button onclick="app.generatePDF(this)" class="flex items-center gap-2 bg-rose-500 hover:bg-rose-600 text-white px-5 py-2.5 rounded-xl font-bold transition shadow-lg shadow-rose-500/20 active:scale-95">
+                        <i class="fas fa-file-pdf"></i> <span class="hidden sm:inline">تنزيل PDF</span>
                     </button>
                 </div>
             </div>
         </header>
 
-        <!-- Navigation Filters -->
-        <nav class="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-200 py-4 shadow-sm">
-            <div class="container mx-auto px-4 overflow-x-auto no-scrollbar">
-                <div class="flex justify-center md:flex-wrap gap-3 whitespace-nowrap" id="system-filters">
-                    <button onclick="app.filterSystem('All', this)" class="filter-btn active">الكل (All)</button>
-                    <button onclick="app.filterSystem('Respiratory', this)" class="filter-btn">الجهاز التنفسي</button>
-                    <button onclick="app.filterSystem('Cardiovascular', this)" class="filter-btn">الجهاز الدوري</button>
-                    <button onclick="app.filterSystem('Digestive', this)" class="filter-btn">الجهاز الهضمي</button>
-                    <button onclick="app.filterSystem('Exercises', this)" class="filter-btn">التمارين</button>
-                </div>
+        <main class="container mx-auto px-4 py-12">
+            <!-- Filter Buttons -->
+            <div class="flex flex-wrap justify-center gap-2 mb-16" id="system-filters">
+                <button onclick="app.filterSystem('All', this)" class="filter-btn active">الكل</button>
+                <button onclick="app.filterSystem('Respiratory', this)" class="filter-btn bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-brand-border">التنفسي</button>
+                <button onclick="app.filterSystem('Cardiovascular', this)" class="filter-btn bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-brand-border">الدوري</button>
+                <button onclick="app.filterSystem('Digestive', this)" class="filter-btn bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-brand-border">الهضمي</button>
+                <button onclick="app.filterSystem('Exercises', this)" class="filter-btn bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-brand-border">تمارين</button>
             </div>
-        </nav>
 
-        <!-- Main Content Area -->
-        <main class="flex-grow container mx-auto px-4 py-12">
-            <div id="content-container" class="space-y-16">
+            <!-- Content Area -->
+            <div id="content-container" class="space-y-20 transition-all duration-500">
                 <!-- Cards will be injected here -->
-                <div class="flex flex-col items-center justify-center py-20 text-slate-400">
-                    <div class="loader-spinner mb-4"></div>
-                    <p>جاري تحميل البيانات التعلمية...</p>
-                </div>
             </div>
         </main>
 
         <!-- Footer -->
-        <footer class="bg-slate-900 text-slate-400 py-8 px-4 text-center border-t border-slate-800">
-            <p class="mb-2">© 2026 دليل أجهزة جسم الإنسان - التعليم التفاعلي</p>
-            <p class="text-xs uppercase tracking-widest text-slate-600 font-bold">Premium Educational Resource</p>
+        <footer class="mt-auto border-t border-slate-200 dark:border-brand-border py-8 px-4 text-center">
+            <p class="text-slate-500 dark:text-slate-400 text-sm font-medium">
+                &copy; 2026 دليل أجهزة جسم الإنسان - التعليم التفاعلي المعتمد على AI
+            </p>
         </footer>
     </div>
 
-    <!-- Modals (Initially Hidden) -->
-    <!-- Quiz Modal -->
-    <div id="quiz-modal" class="modal-backdrop hidden">
-        <div class="modal-content glass max-w-2xl w-full">
-            <div class="modal-header bg-gradient-to-r from-blue-600 to-indigo-700">
-                <h3 class="text-xl font-bold flex items-center gap-2">
-                    <i class="fas fa-brain"></i> اختبار ذكي مخصص
+    <!-- AI Quiz Modal -->
+    <div id="quiz-modal" class="modal-overlay fixed inset-0 bg-slate-900/80 z-50 hidden flex items-center justify-center p-4 backdrop-blur-md">
+        <div class="modal-content bg-white dark:bg-brand-card rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden flex flex-col max-h-[90vh] border border-slate-200 dark:border-brand-border">
+            <div class="p-6 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center bg-slate-50/50 dark:bg-brand-dark/20">
+                <h3 class="text-xl font-bold flex items-center gap-2 text-blue-600 dark:text-blue-400">
+                    <i class="fas fa-magic"></i> تحدي الذكاء الاصطناعي
                 </h3>
-                <button onclick="app.closeQuizModal()" class="close-btn">&times;</button>
+                <button onclick="app.closeQuizModal()" class="text-slate-400 hover:text-red-500 transition"><i class="fas fa-times text-xl"></i></button>
             </div>
             <div id="quiz-body" class="p-8">
-                <!-- Quiz content dynamically injected -->
+                <!-- Content Injected -->
             </div>
         </div>
     </div>
 
-    <!-- Diagnosis Modal -->
-    <div id="diagnosis-modal" class="modal-backdrop hidden">
-        <div class="modal-content glass max-w-2xl w-full">
-            <div class="modal-header bg-gradient-to-r from-emerald-500 to-teal-600">
-                <h3 class="text-xl font-bold flex items-center gap-2">
-                    <i class="fas fa-user-md"></i> تحدي الطبيب الذكي
-                </h3>
-                <button onclick="app.closeDiagnosisGame()" class="close-btn">&times;</button>
-            </div>
-            <div id="diagnosis-body" class="p-8">
-                <!-- Diagnosis content dynamically injected -->
-            </div>
-        </div>
-    </div>
-
-    <!-- JS Logic -->
+    <!-- Scripts -->
     <script src="app.js"></script>
 </body>
 </html>
