@@ -17,84 +17,126 @@
             theme: {
                 extend: {
                     colors: {
-                        darkBg: '#0f172a',
-                        darkCard: '#1e293b',
-                        darkBorder: '#334155'
+                        brandDark: '#0a0f1d',
+                        brandCard: '#151b2e',
+                        brandBorder: '#1e293b'
                     }
                 }
             }
         }
     </script>
-
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="bg-slate-50 text-slate-900 dark:bg-darkBg dark:text-slate-100 antialiased overflow-hidden">
+<body class="bg-slate-50 text-slate-900 dark:bg-brandDark dark:text-slate-100 antialiased overflow-x-hidden">
 
-    <!-- شاشة التحميل -->
-    <div id="initial-loader" class="fixed inset-0 bg-darkBg z-[100] flex flex-col items-center justify-center transition-opacity duration-500">
-        <div class="loader !w-12 !h-12 !border-4"></div>
-        <h2 class="mt-4 text-xl font-bold text-blue-400">جاري تحميل المختبر...</h2>
-    </div>
-
-    <div id="app" class="min-h-screen flex flex-col opacity-0 transition-opacity duration-700">
+    <div id="main-app" class="min-h-screen flex flex-col">
         
-        <!-- ترويسة الموقع -->
-        <header class="sticky top-0 z-40 bg-white/90 dark:bg-darkBg/90 backdrop-blur-md border-b border-slate-200 dark:border-darkBorder py-4 px-6">
-            <div class="container mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-                <div class="flex items-center gap-3">
-                    <div class="bg-blue-600 p-2 rounded-lg text-white shadow-lg shadow-blue-500/30">
-                        <i class="fas fa-heartbeat text-xl"></i>
+        <!-- Header -->
+        <header class="sticky top-0 z-40 bg-white/80 dark:bg-brandDark/80 backdrop-blur-xl border-b border-slate-200 dark:border-brandBorder py-5 px-6 shadow-2xl shadow-blue-500/5">
+            <div class="container mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+                <div class="flex items-center gap-4">
+                    <div class="bg-gradient-to-br from-blue-600 to-indigo-700 p-3 rounded-2xl text-white shadow-xl shadow-blue-500/20">
+                        <i class="fas fa-heartbeat text-2xl"></i>
                     </div>
                     <div>
-                        <h1 class="text-xl font-black">أجهزة جسم الإنسان</h1>
-                        <p class="text-xs text-slate-400 font-bold uppercase tracking-widest hidden sm:block">AI Virtual Lab</p>
+                        <h1 class="text-3xl font-black tracking-tight">أجهزة جسم الإنسان</h1>
+                        <p class="text-[10px] font-black uppercase text-slate-400 tracking-[0.3em]" dir="ltr">AI Virtual Anatomy Lab</p>
                     </div>
                 </div>
 
-                <div class="flex items-center gap-3">
-                    <!-- زر تبديل الوضع الداكن -->
-                    <button onclick="app.toggleTheme()" class="p-3 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-blue-100 dark:hover:bg-blue-900/40 transition">
-                        <i id="theme-btn-icon" class="fas fa-moon text-slate-600 dark:text-amber-400"></i>
+                <div class="flex flex-wrap justify-center items-center gap-3">
+                    <button onclick="toggleTheme()" class="p-4 rounded-2xl bg-white dark:bg-brandCard border border-slate-200 dark:border-brandBorder hover:border-blue-500 transition-all duration-300 shadow-sm active:scale-95">
+                        <i id="theme-icon" class="fas fa-sun text-amber-500 text-lg"></i>
                     </button>
-                    <button onclick="app.openQuiz()" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-bold transition shadow-lg shadow-blue-500/20 active:scale-95">
-                        <i class="fas fa-brain ml-2"></i> اختبار AI
+                    <button onclick="openQuizModal()" class="flex items-center gap-3 bg-blue-600 hover:bg-blue-700 text-white px-7 py-3.5 rounded-2xl font-black transition-all shadow-xl shadow-blue-600/20 active:scale-95">
+                        <i class="fas fa-brain"></i> <span>اختبار الذكاء</span>
                     </button>
-                    <button onclick="app.generatePDF(this)" class="bg-red-500 hover:bg-red-600 text-white px-5 py-2.5 rounded-xl font-bold transition shadow-lg shadow-red-500/20 active:scale-95">
-                        <i class="fas fa-file-pdf ml-2"></i> تحميل PDF
+                    <button onclick="openDiagnosisGame()" class="flex items-center gap-3 bg-emerald-500 hover:bg-emerald-600 text-white px-7 py-3.5 rounded-2xl font-black transition-all shadow-xl shadow-emerald-500/20 active:scale-95">
+                        <i class="fas fa-user-md"></i> <span>تحدي الطبيب</span>
+                    </button>
+                    <button onclick="generateRockSolidPDF(this)" class="flex items-center gap-3 bg-red-500 hover:bg-red-600 text-white px-7 py-3.5 rounded-2xl font-black transition-all shadow-xl shadow-red-500/20 active:scale-95">
+                        <i class="fas fa-file-pdf"></i> <span>تحميل ملزمة</span>
                     </button>
                 </div>
             </div>
         </header>
 
-        <main class="container mx-auto px-4 py-8">
-            <!-- الفلاتر -->
-            <div class="flex flex-wrap justify-center gap-2 mb-12" id="filter-bar">
-                <button onclick="app.applyFilter('All', this)" class="filter-btn active px-6 py-2 rounded-full font-bold transition bg-blue-600 text-white shadow-md">الكل</button>
-                <button onclick="app.applyFilter('Respiratory', this)" class="filter-btn px-6 py-2 rounded-full font-bold transition bg-white dark:bg-darkCard text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-darkBorder">🫁 التنفسي</button>
-                <button onclick="app.applyFilter('Cardiovascular', this)" class="filter-btn px-6 py-2 rounded-full font-bold transition bg-white dark:bg-darkCard text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-darkBorder">❤️ الدوري</button>
-                <button onclick="app.applyFilter('Digestive', this)" class="filter-btn px-6 py-2 rounded-full font-bold transition bg-white dark:bg-darkCard text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-darkBorder">🍕 الهضمي</button>
+        <main class="container mx-auto px-6 py-12 flex-grow">
+            <!-- Filters -->
+            <div class="flex flex-wrap justify-center gap-3 mb-16">
+                <button onclick="filterSystem('All', this)" class="filter-btn active bg-blue-600 text-white px-8 py-3 rounded-full font-bold shadow-xl shadow-blue-600/30 transition-all">الكل</button>
+                <button onclick="filterSystem('Respiratory', this)" class="filter-btn bg-white dark:bg-brandCard text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-brandBorder px-8 py-3 rounded-full font-bold transition-all">🫁 التنفسي</button>
+                <button onclick="filterSystem('Cardiovascular', this)" class="filter-btn bg-white dark:bg-brandCard text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-brandBorder px-8 py-3 rounded-full font-bold transition-all">❤️ الدوري</button>
+                <button onclick="filterSystem('Digestive', this)" class="filter-btn bg-white dark:bg-brandCard text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-brandBorder px-8 py-3 rounded-full font-bold transition-all">🍕 الهضمي</button>
+                <button onclick="filterSystem('Exercises', this)" class="filter-btn bg-white dark:bg-brandCard text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-brandBorder px-8 py-3 rounded-full font-bold transition-all">📝 التمارين</button>
             </div>
 
-            <div id="cards-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 transition-all duration-500">
-                <!-- سيتم حقن البطاقات هنا -->
+            <!-- Cards Grid -->
+            <div id="cards-container" class="space-y-16">
+                <!-- Cards injected here via app.js -->
             </div>
         </main>
-
-        <!-- فوتر -->
-        <footer class="mt-auto py-8 text-center text-slate-400 text-sm font-bold border-t border-slate-200 dark:border-darkBorder">
-            &copy; 2026 دليل أجهزة جسم الإنسان الذكي - مختبر AI
+        
+        <footer class="py-12 text-center border-t border-slate-200 dark:border-brandBorder bg-slate-50/50 dark:bg-brandDark/50">
+            <div class="flex flex-col items-center gap-4">
+                <div class="h-10 w-10 bg-blue-600 rounded-xl flex items-center justify-center text-white text-xl">
+                    <i class="fas fa-microscope"></i>
+                </div>
+                <p class="text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest text-xs">&copy; 2026 دليل أجهزة جسم الإنسان الذكي - إصدار المختبر</p>
+            </div>
         </footer>
     </div>
 
-    <!-- Modal الاختبار -->
-    <div id="quiz-modal" class="fixed inset-0 bg-black/80 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
-        <div class="bg-white dark:bg-darkCard rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden flex flex-col max-h-[90vh] border border-slate-200 dark:border-darkBorder">
-            <div class="p-6 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center bg-slate-50 dark:bg-darkBg/30">
-                <h3 class="text-xl font-bold flex items-center gap-2"><i class="fas fa-magic text-blue-500"></i> تحدي الذكاء الاصطناعي</h3>
-                <button onclick="app.closeQuiz()" class="text-slate-400 hover:text-red-500 transition"><i class="fas fa-times text-xl"></i></button>
+    <!-- Quiz Modal -->
+    <div id="quiz-modal" class="fixed inset-0 bg-brandDark/90 z-50 hidden flex items-center justify-center p-4 backdrop-blur-xl">
+        <div class="bg-white dark:bg-brandCard rounded-[2.5rem] shadow-[0_0_100px_-20px_rgba(59,130,246,0.3)] max-w-xl w-full overflow-hidden flex flex-col max-h-[90vh] border border-slate-200 dark:border-brandBorder">
+            <div class="p-8 border-b border-slate-100 dark:border-brandBorder flex justify-between items-center bg-slate-50/50 dark:bg-brandDark/30">
+                <h3 class="text-2xl font-black flex items-center gap-3"><i class="fas fa-brain text-blue-500"></i> تحدي المعرفة الذكي</h3>
+                <button onclick="closeQuizModal()" class="h-10 w-10 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-500 hover:text-red-500 hover:bg-red-500/10 transition-all flex items-center justify-center"><i class="fas fa-times text-xl"></i></button>
             </div>
-            <div id="quiz-content" class="p-6 overflow-y-auto">
-                <!-- المحتوى سيولد بواسطة AI -->
+            <div class="p-8 overflow-y-auto">
+                <div id="quiz-loading" class="text-center py-20">
+                    <div class="loader mb-6"></div>
+                    <p class="text-slate-400 font-bold">يتم استدعاء بروتوكول الاختبار...</p>
+                </div>
+                <div id="quiz-question-container" class="hidden">
+                    <h4 id="quiz-question" class="text-2xl font-black mb-10 leading-tight text-slate-800 dark:text-white"></h4>
+                    <div id="quiz-options" class="space-y-4"></div>
+                    <div id="quiz-feedback" class="mt-10 hidden p-6">
+                        <div id="quiz-feedback-title" class="font-black mb-3 text-xl"></div>
+                        <p id="quiz-feedback-text" class="text-sm font-bold opacity-90 leading-relaxed"></p>
+                        <button onclick="generateQuiz()" class="mt-8 w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-2xl font-black shadow-lg shadow-blue-500/20 transition-all">متابعة التحدي</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Diagnosis Modal -->
+    <div id="diagnosis-modal" class="fixed inset-0 bg-brandDark/95 z-50 hidden flex items-center justify-center p-4 backdrop-blur-xl">
+        <div class="bg-white dark:bg-brandCard rounded-[2.5rem] shadow-[0_0_100px_-20px_rgba(16,185,129,0.3)] max-w-xl w-full overflow-hidden flex flex-col max-h-[90vh] border border-slate-200 dark:border-brandBorder">
+            <div class="bg-emerald-600 p-8 text-white flex justify-between items-center shadow-lg shadow-emerald-500/20">
+                <h3 class="text-2xl font-black flex items-center gap-3"><i class="fas fa-user-md text-emerald-200"></i> حالة مريض طارئة</h3>
+                <button onclick="closeDiagnosisGame()" class="h-10 w-10 rounded-full bg-white/10 hover:bg-white/20 transition-all flex items-center justify-center"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <div class="p-8 overflow-y-auto">
+                <div id="diagnosis-loading" class="text-center py-20">
+                    <div class="loader !border-emerald-500 border-t-white mb-6"></div>
+                    <p class="text-slate-400 font-bold">تحميل ملف المريض من السحب...</p>
+                </div>
+                <div id="diagnosis-question-container" class="hidden">
+                    <div class="bg-slate-50 dark:bg-slate-800/50 p-8 rounded-[2rem] border border-slate-200 dark:border-slate-700 mb-10 shadow-sm">
+                        <span class="text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase mb-4 block tracking-widest leading-none">Emergency Case File #424</span>
+                        <h4 id="diagnosis-question" class="text-2xl font-black italic leading-snug text-slate-800 dark:text-white"></h4>
+                    </div>
+                    <p class="font-black text-slate-400 mb-6 uppercase text-xs tracking-widest">اختر التشخيص الطبي:</p>
+                    <div id="diagnosis-options" class="space-y-4"></div>
+                    <div id="diagnosis-feedback" class="mt-10 hidden p-6">
+                        <div id="diagnosis-feedback-title" class="font-black mb-3 text-xl"></div>
+                        <p id="diagnosis-feedback-text" class="text-sm font-bold opacity-90 leading-relaxed"></p>
+                        <button onclick="generateDiagnosis()" class="mt-8 w-full bg-emerald-600 hover:bg-emerald-700 text-white py-4 rounded-2xl font-black shadow-lg shadow-emerald-500/20 transition-all">استقبال مريض آخر</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
